@@ -2,6 +2,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import cv2
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QGraphicsScene
+import os
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -61,19 +63,26 @@ class Ui_MainWindow(object):
         # Camera Capture
         self.timer = QtCore.QTimer()
         self.scene = QGraphicsScene()
-        self.Picture_graphicsView.setScene(self.scene)  # Set the scene for the QGraphicsView
+        # Set the scene for the QGraphicsView
+        self.Picture_graphicsView.setScene(self.scene)
 
         self.captureBtn.clicked.connect(self.capture_and_save)
-        self.captureBtn.setEnabled(True)  # Disable the capture button initially
+        # Disable the capture button initially
+        self.captureBtn.setEnabled(True)
 
         # Start capturing at the beginning
         self.start_camera()
 
+        # Reset Btn
+        self.resetBtn.clicked.connect(self.reset_clicked)
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "OCR Handrwiting Detection"))
+        MainWindow.setWindowTitle(_translate(
+            "MainWindow", "OCR Handrwiting Detection"))
         self.captureBtn.setText(_translate("MainWindow", "CAPTURE"))
-        self.label_2.setText(_translate("MainWindow", "OCR Handwriting Detection"))
+        self.label_2.setText(_translate(
+            "MainWindow", "OCR Handwriting Detection"))
         self.resetBtn.setText(_translate("MainWindow", "RESET"))
         self.translateBtn.setText(_translate("MainWindow", "TRANSLATE"))
         self.label_3.setText(_translate("MainWindow", "Translation:"))
@@ -81,8 +90,13 @@ class Ui_MainWindow(object):
         self.autocorrectBtn.setText(_translate("MainWindow", "AUTOCORRECT"))
 
     def start_camera(self):
-        self.cap = cv2.VideoCapture(0)  # 0 for the default camera (you can change it if you have multiple cameras)
+        # 0 for the default camera (you can change it if you have multiple cameras)
+        self.cap = cv2.VideoCapture(0)
+
+        # Reconnect the timer to the update_frame method
         self.timer.timeout.connect(self.update_frame)
+
+        # Start the timer
         self.timer.start(30)  # Update the frame every 30 milliseconds
 
     def update_frame(self):
@@ -97,15 +111,50 @@ class Ui_MainWindow(object):
 
             height, width, channel = frame.shape
             bytesPerLine = 3 * width
-            qImg = QImage(frame.data, width, height, bytesPerLine, QImage.Format_RGB888)
+            qImg = QImage(frame.data, width, height,
+                          bytesPerLine, QImage.Format_RGB888)
             pixmap = QPixmap.fromImage(qImg)
             self.scene.clear()  # Clear the previous frame
             self.scene.addPixmap(pixmap)
 
     def capture_and_save(self):
+        # Disable camera capture by stopping the timer
+        self.timer.stop()
+
         ret, frame = self.cap.read()
         if ret:
-            cv2.imwrite('0.tif', frame)  # Save the captured frame as '0.tif' in the script's directory
+            # Save the captured frame as '0.tif' in the script's directory
+            cv2.imwrite('0.tif', frame)
+
+        # Release the camera capture to disable it
+        self.cap.release()
+
+        image = QtGui.QPixmap("0.tif")
+        scaled_image = image.scaled(self.Picture_graphicsView.size(),
+                                    QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+
+        scene = QtWidgets.QGraphicsScene()
+        scene.addPixmap(scaled_image)
+
+        self.Picture_graphicsView.setScene(scene)
+        self.Picture_graphicsView.fitInView(
+            scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+        self.Picture_graphicsView.centerOn(scene.sceneRect().center())
+
+    def reset_clicked(self):
+
+        # Delete '0.tif' file if it exists
+        if os.path.exists('0.tif'):
+            os.remove('0.tif')
+
+        # Camera Capture
+        self.timer = QtCore.QTimer()
+        self.scene = QGraphicsScene()
+        # Set the scene for the QGraphicsView
+        self.Picture_graphicsView.setScene(self.scene)
+
+        self.start_camera()
+
 
 if __name__ == "__main__":
     import sys
