@@ -160,12 +160,12 @@ class Ui_MainWindow(object):
         ret, frame = self.cap.read()
         if ret:
             # Save the captured frame as '0.tif' in the script's directory
-            cv2.imwrite('test_img/0.tif', frame)
+            cv2.imwrite('test_image/0.tif', frame)
 
         # Release the camera capture to disable it
         self.cap.release()
 
-        image = QtGui.QPixmap("test_img/0.tif")
+        image = QtGui.QPixmap("test_image/0.tif")
         scaled_image = image.scaled(self.Picture_graphicsView.size(),
                                     QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
 
@@ -187,8 +187,8 @@ class Ui_MainWindow(object):
         self.cap.release()
 
         # Delete '0.tif' file if it exists
-        if os.path.exists('test_img/0.tif'):
-            os.remove('test_img/0.tif')
+        if os.path.exists('test_image/0.tif'):
+            os.remove('test_image/0.tif')
 
         # Camera Capture
         self.timer = QtCore.QTimer()
