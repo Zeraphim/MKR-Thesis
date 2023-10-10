@@ -167,7 +167,7 @@ class Ui_MainWindow(object):
         ret, frame = self.cap.read()
         if ret:
             # Save the captured frame with the absolute path
-            save_path = '/home/pi/Desktop/MKR-Thesis/test_image/0.tif'
+            save_path = 'test_image/0.tif'
             cv2.imwrite(save_path, frame)
 
             # Load the image with the absolute path
