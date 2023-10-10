@@ -4,6 +4,14 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QGraphicsScene
 import os
 
+import pytesseract
+from difflib import SequenceMatcher as SQ
+
+try:
+    from PIL import Image
+except ImportError:
+    import Image
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -76,6 +84,9 @@ class Ui_MainWindow(object):
         # Reset Btn
         self.resetBtn.clicked.connect(self.reset_clicked)
 
+        # Translate BBtn
+        self.translateBtn.clicked.connect(self.translate_clicked)
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate(
@@ -124,12 +135,12 @@ class Ui_MainWindow(object):
         ret, frame = self.cap.read()
         if ret:
             # Save the captured frame as '0.tif' in the script's directory
-            cv2.imwrite('0.tif', frame)
+            cv2.imwrite('test_img/0.tif', frame)
 
         # Release the camera capture to disable it
         self.cap.release()
 
-        image = QtGui.QPixmap("0.tif")
+        image = QtGui.QPixmap("test_img/0.tif")
         scaled_image = image.scaled(self.Picture_graphicsView.size(),
                                     QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
 
@@ -144,8 +155,8 @@ class Ui_MainWindow(object):
     def reset_clicked(self):
 
         # Delete '0.tif' file if it exists
-        if os.path.exists('0.tif'):
-            os.remove('0.tif')
+        if os.path.exists('test_img/0.tif'):
+            os.remove('test_img/0.tif')
 
         # Camera Capture
         self.timer = QtCore.QTimer()
@@ -154,6 +165,15 @@ class Ui_MainWindow(object):
         self.Picture_graphicsView.setScene(self.scene)
 
         self.start_camera()
+
+    def translate_clicked(self):
+        img_path = '0.tif'
+        img = Image.open(img_path)
+        raw_text = pytesseract.image_to_string(
+            img, lang="example_model", config='--psm 7')  # eng or example_model
+        target = "The computers are becoming sentient,"
+
+        self.translationTxt.setPlainText(raw_text)
 
 
 if __name__ == "__main__":
