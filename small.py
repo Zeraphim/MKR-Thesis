@@ -172,21 +172,16 @@ class Ui_MainWindow(object):
 
             # Load the image with the absolute path
             image = QtGui.QPixmap(save_path)
+            scaled_image = image.scaled(self.Picture_graphicsView.size(),
+                                        QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
 
-            # Check if the image is not null before scaling and displaying
-            if not image.isNull():
-                scaled_image = image.scaled(self.Picture_graphicsView.size(),
-                                            QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+            scene = QtWidgets.QGraphicsScene()
+            scene.addPixmap(scaled_image)
 
-                scene = QtWidgets.QGraphicsScene()
-                scene.addPixmap(scaled_image)
-
-                self.Picture_graphicsView.setScene(scene)
-                self.Picture_graphicsView.fitInView(
-                    scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
-                self.Picture_graphicsView.centerOn(scene.sceneRect().center())
-            else:
-                print("Error: Image could not be loaded.")
+            self.Picture_graphicsView.setScene(scene)
+            self.Picture_graphicsView.fitInView(
+                scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+            self.Picture_graphicsView.centerOn(scene.sceneRect().center())
         else:
             print("Error: Unable to capture frame.")
 
