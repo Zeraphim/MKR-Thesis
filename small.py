@@ -88,6 +88,34 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        # Camera Capture
+        self.timer = QtCore.QTimer()
+        self.scene = QGraphicsScene()
+        # Set the scene for the QGraphicsView
+        self.Picture_graphicsView.setScene(self.scene)
+
+        self.captureBtn.clicked.connect(self.capture_and_save)
+        # Disable the capture button initially
+        self.captureBtn.setEnabled(True)
+
+        # Start capturing at the beginning
+        self.start_camera()
+
+        # Reset Btn
+        self.resetBtn.clicked.connect(self.reset_clicked)
+
+        # Translate Btn
+        self.translateBtn.clicked.connect(self.translate_clicked)
+
+        # Autocorrect Btn
+        self.autocorrectBtn.clicked.connect(self.autocorrect_clicked)
+
+        # Browse Btn
+        self.browseBtn.clicked.connect(self.browse_image)
+
+        # Raw text result
+        raw_text = ""
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate(
@@ -103,6 +131,151 @@ class Ui_MainWindow(object):
         self.browseBtn.setText(_translate("MainWindow", "BROWSE"))
         self.label.setText(_translate(
             "MainWindow", "/Users/Zeraphim/Desktop/Proto_Test/Images/test3.png"))
+
+    def start_camera(self):
+        # 0 for the default camera (you can change it if you have multiple cameras)
+        self.cap = cv2.VideoCapture(0)
+
+        # Reconnect the timer to the update_frame method
+        self.timer.timeout.connect(self.update_frame)
+
+        # Start the timer
+        self.timer.start(30)  # Update the frame every 30 milliseconds
+
+    def update_frame(self):
+        ret, frame = self.cap.read()
+        if ret:
+            # Get the dimensions of the QGraphicsView
+            view_width = self.Picture_graphicsView.width()
+            view_height = self.Picture_graphicsView.height()
+
+            # Resize the frame to fit the QGraphicsView dimensions
+            frame = cv2.resize(frame, (view_width, view_height))
+
+            height, width, channel = frame.shape
+            bytesPerLine = 3 * width
+            qImg = QImage(frame.data, width, height,
+                          bytesPerLine, QImage.Format_RGB888)
+            pixmap = QPixmap.fromImage(qImg)
+            self.scene.clear()  # Clear the previous frame
+            self.scene.addPixmap(pixmap)
+
+    def capture_and_save(self):
+        # Disable camera capture by stopping the timer
+        self.timer.stop()
+
+        ret, frame = self.cap.read()
+        if ret:
+            # Save the captured frame as '0.tif' in the script's directory
+            cv2.imwrite('test_image/0.tif', frame)
+
+        # Release the camera capture to disable it
+        self.cap.release()
+
+        image = QtGui.QPixmap("test_image/0.tif")
+        scaled_image = image.scaled(self.Picture_graphicsView.size(),
+                                    QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+
+        scene = QtWidgets.QGraphicsScene()
+        scene.addPixmap(scaled_image)
+
+        self.Picture_graphicsView.setScene(scene)
+        self.Picture_graphicsView.fitInView(
+            scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+        self.Picture_graphicsView.centerOn(scene.sceneRect().center())
+
+    def reset_clicked(self):
+        _translate = QtCore.QCoreApplication.translate
+
+        # Disable camera capture by stopping the timer
+        self.timer.stop()
+
+        # Release the camera capture to disable it
+        self.cap.release()
+
+        # Delete '0.tif' file if it exists
+        if os.path.exists('test_image/0.tif'):
+            os.remove('test_image/0.tif')
+
+        # Camera Capture
+        self.timer = QtCore.QTimer()
+        self.scene = QGraphicsScene()
+        # Set the scene for the QGraphicsView
+        self.Picture_graphicsView.setScene(self.scene)
+
+        self.label.setText(_translate(
+            "MainWindow", "..."))
+
+        self.raw_text = ""
+
+        self.translationTxt.setPlainText("")
+        self.autoTranslateTxt.setPlainText("")
+
+        self.start_camera()
+
+    def translate_clicked(self):
+        img_path = 'test_image/0.tif'
+        img = Image.open(img_path)
+
+        self.raw_text = pytesseract.image_to_string(
+            img, lang="example_model", config='--psm 7')  # eng or example_model
+
+        self.translationTxt.setPlainText(self.raw_text)
+
+    def autocorrect_clicked(self):
+
+        # Create a Speller object
+        spell = Speller()
+
+        corrected_text = spell(self.raw_text)
+
+        self.autoTranslateTxt.setPlainText(corrected_text)
+
+    def browse_image(self):
+
+        # Disable camera capture by stopping the timer
+        self.timer.stop()
+
+        # Release the camera capture to disable it
+        self.cap.release()
+
+        file_dialog = QFileDialog()
+        file_path, _ = file_dialog.getOpenFileName(
+            None, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.tif)")
+        self.file_path_global = file_path
+        filename = os.path.basename(file_path)
+        self.filename = filename
+
+        if file_path:
+            self.label.setText(file_path)
+            self.show_image(file_path)
+
+            # Save the selected image as "0.tif" in the "test_image" folder
+            save_folder = "test_image"
+            os.makedirs(save_folder, exist_ok=True)
+            save_path = os.path.join(save_folder, "0.tif")
+
+            # Use a try-except block to handle errors
+            try:
+                # Copy the selected image to the "test_image" folder with the name "0.tif"
+                import shutil
+                shutil.copy(file_path, save_path)
+            except Exception as e:
+                print(f"Error saving image: {e}")
+
+    def show_image(self, image_path):
+
+        image = QtGui.QPixmap(image_path)
+        scaled_image = image.scaled(self.Picture_graphicsView.size(
+        ), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+
+        scene = QtWidgets.QGraphicsScene()
+        scene.addPixmap(scaled_image)
+
+        self.Picture_graphicsView.setScene(scene)
+        self.Picture_graphicsView.fitInView(
+            scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+        self.Picture_graphicsView.centerOn(scene.sceneRect().center())
 
 
 if __name__ == "__main__":
