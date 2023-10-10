@@ -166,24 +166,23 @@ class Ui_MainWindow(object):
 
         ret, frame = self.cap.read()
         if ret:
-            # Save the captured frame with the absolute path
-            save_path = 'test_image/0.tif'
-            cv2.imwrite(save_path, frame)
+            # Save the captured frame as '0.tif' in the script's directory
+            cv2.imwrite('test_image/0.tif', frame)
 
-            # Load the image with the absolute path
-            image = QtGui.QPixmap(save_path)
-            scaled_image = image.scaled(self.Picture_graphicsView.size(),
-                                        QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        # Release the camera capture to disable it
+        self.cap.release()
 
-            scene = QtWidgets.QGraphicsScene()
-            scene.addPixmap(scaled_image)
+        image = QtGui.QPixmap("test_image/0.tif")
+        scaled_image = image.scaled(self.Picture_graphicsView.size(),
+                                    QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
 
-            self.Picture_graphicsView.setScene(scene)
-            self.Picture_graphicsView.fitInView(
-                scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
-            self.Picture_graphicsView.centerOn(scene.sceneRect().center())
-        else:
-            print("Error: Unable to capture frame.")
+        scene = QtWidgets.QGraphicsScene()
+        scene.addPixmap(scaled_image)
+
+        self.Picture_graphicsView.setScene(scene)
+        self.Picture_graphicsView.fitInView(
+            scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+        self.Picture_graphicsView.centerOn(scene.sceneRect().center())
 
         # Release the camera capture to disable it
         self.cap.release()
