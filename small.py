@@ -166,23 +166,32 @@ class Ui_MainWindow(object):
 
         ret, frame = self.cap.read()
         if ret:
-            # Save the captured frame as '0.tif' in the script's directory
-            cv2.imwrite('test_image/0.tif', frame)
+            # Save the captured frame with the absolute path
+            save_path = '/home/pi/Desktop/MKR-Thesis/test_image/0.tif'
+            cv2.imwrite(save_path, frame)
+
+            # Load the image with the absolute path
+            image = QtGui.QPixmap(save_path)
+
+            # Check if the image is not null before scaling and displaying
+            if not image.isNull():
+                scaled_image = image.scaled(self.Picture_graphicsView.size(),
+                                            QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+
+                scene = QtWidgets.QGraphicsScene()
+                scene.addPixmap(scaled_image)
+
+                self.Picture_graphicsView.setScene(scene)
+                self.Picture_graphicsView.fitInView(
+                    scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+                self.Picture_graphicsView.centerOn(scene.sceneRect().center())
+            else:
+                print("Error: Image could not be loaded.")
+        else:
+            print("Error: Unable to capture frame.")
 
         # Release the camera capture to disable it
         self.cap.release()
-
-        image = QtGui.QPixmap("test_image/0.tif")
-        scaled_image = image.scaled(self.Picture_graphicsView.size(),
-                                    QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-
-        scene = QtWidgets.QGraphicsScene()
-        scene.addPixmap(scaled_image)
-
-        self.Picture_graphicsView.setScene(scene)
-        self.Picture_graphicsView.fitInView(
-            scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
-        self.Picture_graphicsView.centerOn(scene.sceneRect().center())
 
     def reset_clicked(self):
         _translate = QtCore.QCoreApplication.translate
