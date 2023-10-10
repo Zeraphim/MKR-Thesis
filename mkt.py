@@ -180,6 +180,12 @@ class Ui_MainWindow(object):
     def reset_clicked(self):
         _translate = QtCore.QCoreApplication.translate
 
+        # Disable camera capture by stopping the timer
+        self.timer.stop()
+
+        # Release the camera capture to disable it
+        self.cap.release()
+
         # Delete '0.tif' file if it exists
         if os.path.exists('test_img/0.tif'):
             os.remove('test_img/0.tif')
