@@ -1,21 +1,83 @@
-import sys
-import pytesseract
-from difflib import SequenceMatcher as SQ
+# import sys
+# import pytesseract
+# from difflib import SequenceMatcher as SQ
 
-try:
-    from PIL import Image
-except ImportError:
-    import Image
+# try:
+#     from PIL import Image
+# except ImportError:
+#     import Image
 
-# lang = sys.argv[1]
+# raw_string = pytesseract.image_to_string("/Users/zeraphim/Desktop/aaa.png", lang="eng", config='--psm 7')  # eng or example_model
 
-# img_path = 'data/validation/0.tif'
-img_path = '0.tif'
-img = Image.open(img_path)
-raw_text = pytesseract.image_to_string(
-    img, lang="example_model", config='--psm 7')  # eng or example_model
-target = "The computers are becoming sentient,"
-percent_coincidence = round(SQ(None, target, raw_text).ratio() * 100, 2)
+# print(raw_string)
 
-print("Output: {}\nPercent coincidence: {}%".format(
-    raw_text, percent_coincidence))
+import os
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]= r"gvision_auth.json"
+
+
+def detect_document(path):
+    """Detects document features in an image."""
+    from google.cloud import vision
+
+    client = vision.ImageAnnotatorClient()
+
+    with open(path, "rb") as image_file:
+        content = image_file.read()
+
+    image = vision.Image(content=content)
+
+    response = client.document_text_detection(image=image)
+
+    for page in response.full_text_annotation.pages:
+        for block in page.blocks:
+            print(f"\nBlock confidence: {block.confidence}\n")
+
+            for paragraph in block.paragraphs:
+                print("Paragraph confidence: {}".format(paragraph.confidence))
+
+                for word in paragraph.words:
+                    word_text = "".join([symbol.text for symbol in word.symbols])
+                    print(
+                        "Word text: {} (confidence: {})".format(
+                            word_text, word.confidence
+                        )
+                    )
+
+                    for symbol in word.symbols:
+                        print(
+                            "\tSymbol: {} (confidence: {})".format(
+                                symbol.text, symbol.confidence
+                            )
+                        )
+
+    if response.error.message:
+        raise Exception(
+            "{}\nFor more info on error messages, check: "
+            "https://cloud.google.com/apis/design/errors".format(response.error.message)
+        )
+
+# def detect_document(path):
+#     """Detects document features in an image."""
+#     from google.cloud import vision
+
+#     client = vision.ImageAnnotatorClient()
+
+#     with open(path, "rb") as image_file:
+#         content = image_file.read()
+
+#     image = vision.Image(content=content)
+
+#     response = client.document_text_detection(image=image)
+
+#     for page in response.full_text_annotation.pages:
+#         for block in page.blocks:
+#             for paragraph in block.paragraphs:
+#                 for word in paragraph.words:
+#                     word_text = "".join([symbol.text for symbol in word.symbols])
+#                     print(word_text, end=' ')
+#     print()  # Print a newline at the end
+
+img_path = "/Users/zeraphim/Desktop/MKR-Thesis/demo_images/s1.png"
+
+detect_document(img_path)

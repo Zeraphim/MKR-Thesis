@@ -25,11 +25,36 @@ try:
 except ImportError:
     import Image
 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]= r"gvision_auth.json"
+
+def detect_document(path):
+    """Detects document features in an image."""
+    from google.cloud import vision
+
+    client = vision.ImageAnnotatorClient()
+
+    with open(path, "rb") as image_file:
+        content = image_file.read()
+
+    image = vision.Image(content=content)
+
+    response = client.document_text_detection(image=image)
+
+    detected_text = ""
+    for page in response.full_text_annotation.pages:
+        for block in page.blocks:
+            for paragraph in block.paragraphs:
+                for word in paragraph.words:
+                    word_text = "".join([symbol.text for symbol in word.symbols])
+                    detected_text += word_text + ' '
+                detected_text += '\n'  # Add a newline character after each paragraph
+
+    return detected_text.strip()
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(566, 369)
+        MainWindow.resize(566, 406)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.Picture_graphicsView = QtWidgets.QGraphicsView(self.centralwidget)
@@ -62,13 +87,13 @@ class Ui_MainWindow(object):
         self.label_3.setGeometry(QtCore.QRect(20, 250, 71, 16))
         self.label_3.setObjectName("label_3")
         self.translationTxt = QtWidgets.QTextBrowser(self.centralwidget)
-        self.translationTxt.setGeometry(QtCore.QRect(100, 250, 441, 31))
+        self.translationTxt.setGeometry(QtCore.QRect(100, 250, 441, 51))
         self.translationTxt.setObjectName("translationTxt")
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
-        self.label_4.setGeometry(QtCore.QRect(20, 300, 71, 16))
+        self.label_4.setGeometry(QtCore.QRect(20, 310, 71, 16))
         self.label_4.setObjectName("label_4")
         self.autoTranslateTxt = QtWidgets.QTextBrowser(self.centralwidget)
-        self.autoTranslateTxt.setGeometry(QtCore.QRect(100, 300, 441, 31))
+        self.autoTranslateTxt.setGeometry(QtCore.QRect(100, 310, 441, 51))
         self.autoTranslateTxt.setObjectName("autoTranslateTxt")
         self.autocorrectBtn = QtWidgets.QPushButton(self.centralwidget)
         self.autocorrectBtn.setGeometry(QtCore.QRect(370, 160, 141, 31))
@@ -166,13 +191,13 @@ class Ui_MainWindow(object):
 
         ret, frame = self.cap.read()
         if ret:
-            # Save the captured frame as '0.tif' in the script's directory
-            cv2.imwrite('test_image/0.tif', frame)
+            # Save the captured frame as '0.png' in the script's directory
+            cv2.imwrite('test_image/0.png', frame)
 
         # Release the camera capture to disable it
         self.cap.release()
 
-        image = QtGui.QPixmap("test_image/0.tif")
+        image = QtGui.QPixmap("test_image/0.png")
         scaled_image = image.scaled(self.Picture_graphicsView.size(),
                                     QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
 
@@ -196,9 +221,9 @@ class Ui_MainWindow(object):
         # Release the camera capture to disable it
         self.cap.release()
 
-        # Delete '0.tif' file if it exists
-        if os.path.exists('test_image/0.tif'):
-            os.remove('test_image/0.tif')
+        # Delete '0.png' file if it exists
+        if os.path.exists('test_image/0.png'):
+            os.remove('test_image/0.png')
 
         # Camera Capture
         self.timer = QtCore.QTimer()
@@ -217,11 +242,13 @@ class Ui_MainWindow(object):
         self.start_camera()
 
     def translate_clicked(self):
-        img_path = 'test_image/0.tif'
-        img = Image.open(img_path)
+        img_path = 'test_image/0.png'
+        # img = Image.open(img_path)
 
-        self.raw_text = pytesseract.image_to_string(
-            img, lang="example_model", config='--psm 7')  # eng or example_model
+        # self.raw_text = pytesseract.image_to_string(
+        #     img, lang="example_model", config='--psm 7')  # eng or example_model
+
+        self.raw_text = detect_document(img_path)
 
         self.translationTxt.setPlainText(self.raw_text)
 
@@ -244,7 +271,7 @@ class Ui_MainWindow(object):
 
         file_dialog = QFileDialog()
         file_path, _ = file_dialog.getOpenFileName(
-            None, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.tif)")
+            None, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.png)")
         self.file_path_global = file_path
         filename = os.path.basename(file_path)
         self.filename = filename
@@ -253,14 +280,14 @@ class Ui_MainWindow(object):
             self.label.setText(file_path)
             self.show_image(file_path)
 
-            # Save the selected image as "0.tif" in the "test_image" folder
+            # Save the selected image as "0.png" in the "test_image" folder
             save_folder = "test_image"
             os.makedirs(save_folder, exist_ok=True)
-            save_path = os.path.join(save_folder, "0.tif")
+            save_path = os.path.join(save_folder, "0.png")
 
             # Use a try-except block to handle errors
             try:
-                # Copy the selected image to the "test_image" folder with the name "0.tif"
+                # Copy the selected image to the "test_image" folder with the name "0.png"
                 import shutil
                 shutil.copy(file_path, save_path)
             except Exception as e:

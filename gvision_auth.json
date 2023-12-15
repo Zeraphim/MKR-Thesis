@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sparta-321815",
+  "private_key_id": "6f41b8ab790a2868048e8e0c24bf3b3709ccc6f1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDQ+hs6tIc4sf1q\nwI4IDVFVWWbxJLkMWsivTbeMXx+tDRWKbKaixdtK+Oke4eSlfa+OhfRxgD7VMim5\nEO6Bighy/j2nPrMO4mWYn++4OiKyVwmVc448oxm9o/qsEnyDqNN4fKNj6E4A9xpW\nrZflv374JowYY1+AVZ8zxBBsbvhhn3MDc+wC0e2efl4qNmV1KT+saUzpST+mAwJq\n5QHWEtjKuECcE+2z3n0NNw0AJjJbfa9Z2svLXLPXK3QQKvur/5N7hbMjd6b2Y9vS\n3OU2F7HjV+eeAcCpu2/XJ0p6/XxnFQILzNqg5VNhlaqRoU0TI4KDRYWJf2mU+tNo\n55fdlSIhAgMBAAECggEAE+sKxl0nmE1KuK6Suwy96FMlny1fX+CVSTQwnvYAGGfr\nWi7B8TjHjo1L9vAT8XwZzA1Tf6/4DS0DUgrdmMY1yPQXn0W4Hl6QzWvNFvOfk/z8\nwlxpvbjT/sHO5jC64neodE746dBeAvSKc6GHHVRTv0Y5SyfJlftTOcVhxVwMW42B\nes5hRmUuuGxQKh2QnpeSf0uwKMy9yMjQny7lvJ6UrvnSYXbKF0OUvmfg5aCU5ohJ\nIOLIo8DCQAM+9ea0b3XlgGkhP4aCSYsbyQnsg6cbmdBaao6bwKVCl37JUfUOOEKQ\nhscV3T/dVC2S+lsIHCZ6Q2Jt2RHHliCQ+p7RjnS04QKBgQDoUAh5mEj1LswGr6/t\nbRKv1hchTDEBCxr7xdXmDTltZ6oT2bcv5JwPRFLGRWarbnZxr5+v7nOW63D2+Mq/\n6G5rA8b7hRGvlpnhl7r0YZ6HwNApcR7SnM8B/Wxv8V6AoZfzsvrisNsDrNY6dqB9\nGGpNlGracKpI/dlxnOJ92pm7OQKBgQDmSPOmg8MEn9mpSJQBDTlAEb0YwxHJSlRu\nAPulGOV/PaiAhEQhAbPUDufzzN0N24qa6iW8NQxwrchshzYr0JYEH7APMWTD1gIx\nTlhSrHLNRU5gt6dZNeKvmOEeanVmJnaHK9D6pjh5tjonq8Zpwqz6FlAYcIfjd9Vq\nb8vM2ZlWKQKBgCL54bzE478eU5NyIg+iC10z43mc6gfZLy/W4lRni0zgfafNcJoi\nViiqRbgaPNH0qJqHMYigYwDG49QbMxNfoDg2cl/t8fK4vuRLHteqVt7jdbO3l0do\nWnZXPFtCQNMnASSsvr8gl2jfPcXBlHohEegqP0gyDEE/DtzfHO6L2fdpAoGAQHi0\nHi5NbwIBwi8boJ+/I3zT4Bbc5+nzcUi9Kx+pQNJWVoSxPjxnyDrUHaGBUdvhFjXv\nkp2XegRtVFUWiXXASi9E7zv45gsIWh2BBMRa77UzmEhShdtcN6UpgYZ0j8C89mMC\nAup+bTTjWy/wQLPMEcglbHI02S43hbD+8b8J+uECgYB1gEVZxvjPR1eS2U80yKNN\nNmnrZY/gMO5e77kp1PY+xX1+gbwUihxG4hbpiYSvJZYc9+FU1M0RANizyb6vtgxy\nRbbBUlwvrSz9BfiyvY30etadhDk7pif9FJMT0f1XtN64VAzppvKA2/wea19bIZtL\neXoaySh12JdJWNGGh45z/w==\n-----END PRIVATE KEY-----\n",
+  "client_email": "vision-api@sparta-321815.iam.gserviceaccount.com",
+  "client_id": "113949721133775880406",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/vision-api%40sparta-321815.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
